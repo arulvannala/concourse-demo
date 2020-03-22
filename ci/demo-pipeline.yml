@@ -9,46 +9,46 @@ resources:
 - name: app
   type: git
   source:
-    uri: git@github.com:clarafu/concourse-demo.git
+    uri: git@github.com:arulvannala/concourse-demo.git
     branch: master
-    private_key: ((app-repo-key))
-  icon: github-circle
-  public: true
+    private_key: ((plat-auto-pipes-deploy-key.private_key))
+
+
 
 - name: version
   type: semver
   source:
     driver: git
-    uri: git@github.com:clarafu/concourse-demo.git
+    uri: git@github.com:arulvannala/concourse-demo.git
     branch: version
     file: version
-    private_key: ((app-repo-key))
-  icon: tag
-  public: true
+    private_key: ((plat-auto-pipes-deploy-key.private_key))
+
+
 
 - name: app-pre-release
   type: github-release
   source:
-    owner: clarafu
+    owner: arulvannala
     repository: concourse-demo
     access_token: ((dummy-user-access-token))
     pre_release: true
     release: false
-  public: true
-  icon: github-circle
+
+
 
 - name: app-release
   type: github-release
   source:
-    owner: clarafu
+    owner: arulvannala
     repository: concourse-demo
     access_token: ((dummy-user-access-token))
-  public: true
-  icon: github-circle
+
+
 
 jobs:
 - name: test
-  public: true
+
   plan:
   - get: app
     trigger: true
@@ -56,13 +56,13 @@ jobs:
     file: app/ci/tasks/test-app.yml
 
 - name: bump-version
-  public: true
+
   plan:
   - put: version
     params: {bump: major}
 
 - name: build
-  public: true
+
   plan:
   - get: version
   - get: app
@@ -78,7 +78,7 @@ jobs:
       - built-app/app
 
 - name: publish
-  public: true
+
   plan:
   - get: version
     passed: [build]
@@ -90,4 +90,3 @@ jobs:
       tag: version/version
       globs:
       - app-pre-release/app
-
